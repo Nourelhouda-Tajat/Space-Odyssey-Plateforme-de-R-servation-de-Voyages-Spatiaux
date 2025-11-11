@@ -147,15 +147,18 @@
                     <p class="text-gray-300">Access your account and journey details</p>
                 </div>
                 
-                <form class="space-y-6">
+                <form class="space-y-6 form_login">
                     <div>
                         <label class="block text-gray-300 mb-2">Email Address</label>
-                        <input type="email" class="form-input w-full px-4 py-3" placeholder="Enter your email">
+                        <input type="email" class="form-input w-full px-4 py-3"  id="email" placeholder="Enter your email">
+                        <small class="msg_err_email"></small>
                     </div>
                     
                     <div>
                         <label class="block text-gray-300 mb-2">Password</label>
-                        <input type="password" class="form-input w-full px-4 py-3" placeholder="Enter your password">
+                        <input type="password" class="form-input w-full px-4 py-3" id="password" placeholder="Enter your password">
+                        <small class="msg_err_password"></small>
+
                     </div>
                     
                     <div class="flex items-center justify-between">
@@ -269,6 +272,30 @@
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
         });
+
+        //regex
+        //validation de formulaire
+        function requiredForm() {
+            const email = document.getElementById("email").value;
+            const passeword = document.getElementById("password").value;
+            const msgErrEmail = document.querySelector(".msg_err_email");
+            const msgErrPassword = document.querySelector(".msg_err_password");
+            if (email ==="") {
+                msgErrEmail.textContent = 'Email is required'
+
+                return false; 
+            }
+            if (passeword === ""){
+                msgErrPassword.textContent = 'Passeword is required'
+                return false;
+            }
+        };
+        function validateInput(input, regex){
+            onst passeword = document.getElementById("password").value;
+            const passwordRegex= /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$%#*&-]){8,}$/; 
+
+
+        };
     </script>
 </body>
 </html>
