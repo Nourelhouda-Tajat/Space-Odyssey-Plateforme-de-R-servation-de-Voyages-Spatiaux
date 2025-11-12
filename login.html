@@ -67,6 +67,12 @@
             color: white;
             transition: all 0.3s ease;
         }
+        .form-input.valid{
+            border: 2px solid rgb(18, 108, 18);
+        }
+        .form-input.invalid{
+            border: 2px solid red;
+        }
         
         .form-input:focus {
             border-color: rgba(14, 165, 233, 0.7);
@@ -147,10 +153,10 @@
                     <p class="text-gray-300">Access your account and journey details</p>
                 </div>
                 
-                <form class="space-y-6 form_login">
+                <form id="form_login" class="space-y-6 form_login">
                     <div>
                         <label class="block text-gray-300 mb-2">Email Address</label>
-                        <input type="email" class="form-input w-full px-4 py-3"  id="email" placeholder="Enter your email">
+                        <input type="text" class="form-input w-full px-4 py-3"  id="email" placeholder="Enter your email">
                         <small class="msg_err_email"></small>
                     </div>
                     
@@ -169,7 +175,7 @@
                         <a href="#" class="text-neon-blue text-sm hover:underline">Forgot password?</a>
                     </div>
                     
-                    <button type="submit" class="btn-primary text-white w-full py-3 rounded-lg font-bold glow">
+                    <button type="submit" class="btn-primary text-white w-full py-3 rounded-lg font-bold glow btn_submit">
                         Login to Account
                     </button>
                 </form>
@@ -272,30 +278,58 @@
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
         });
+       // Validation de formulaire
+        const form = document.getElementById("form_login");
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const msgErrEmail = document.querySelector(".msg_err_email");
+        const msgErrPassword = document.querySelector(".msg_err_password");
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$%#*&\-]).{8,}$/;
+        const emailRegex = /^\w+@[a-z]+\.[a-z]{2,}$/;
+        const submitBtn=document.getElementByClass("btn_submit");
 
-        //regex
-        //validation de formulaire
-        function requiredForm() {
-            const email = document.getElementById("email").value;
-            const passeword = document.getElementById("password").value;
-            const msgErrEmail = document.querySelector(".msg_err_email");
-            const msgErrPassword = document.querySelector(".msg_err_password");
-            if (email ==="") {
-                msgErrEmail.textContent = 'Email is required'
-
-                return false; 
-            }
-            if (passeword === ""){
-                msgErrPassword.textContent = 'Passeword is required'
+        function setValid(input){
+            input.classList.add('valid');
+            input.classList.remove('invalid');
+        };
+        function setInvalid(input) {
+            input.classList.add('invalid');
+            input.classList.remove('valid');
+        };
+        function validInput(input, regex,msgErro){
+            if(input.value.trim()===""){
+                msgErro.textContent = 'This field is required '
+                msgErro.style.color='red';
+                setInvalid(input);
                 return false;
+            } else if (!regex.test(input.value)) {
+                msgErro.textContent=' Invalid inputs'
+                msgErro.style.color='red';
+                setInvalid(input);
+                return false;
+            } else {
+                msgErro.textContent=''
+                msgErro.style.color='green';
+                setValid(input);
+                return true;
             }
-        };
-        function validateInput(input, regex){
-            onst passeword = document.getElementById("password").value;
-            const passwordRegex= /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$%#*&-]){8,}$/; 
+        }
+        email.addEventListener('input',()=> validInput(email,emailRegex,msgErrEmail));
+        password.addEventListener('input', ()=> validInput(password,passwordRegex,msgErrPassword));
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const validEmail= validInput(email,emailRegex,msgErrEmail);
+            const validPassword=validInput(password,passwordRegex,msgErrPassword);
+            if(validEmail && validPassword){
+                alert('Login successful !');
+            }
+            form.reset();
+            email.classList.remove('valid', 'invalid');
+            password.classList.remove('valid', 'invalid');
+        });
+        
 
-
-        };
+        
     </script>
 </body>
 </html>
