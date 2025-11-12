@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SpaceVoyager</title>
+    <title>Booking - SpaceVoyager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -53,14 +53,14 @@
             text-shadow: 0 0 10px rgba(14, 165, 233, 0.7);
         }
         
-        .login-card {
+        .booking-card {
             background: rgba(26, 26, 46, 0.7);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(14, 165, 233, 0.3);
             border-radius: 15px;
         }
         
-        .form-input {
+        .form-input, .form-select, .form-textarea {
             background: rgba(22, 33, 62, 0.5);
             border: 1px solid rgba(14, 165, 233, 0.3);
             border-radius: 8px;
@@ -68,10 +68,62 @@
             transition: all 0.3s ease;
         }
         
-        .form-input:focus {
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
             border-color: rgba(14, 165, 233, 0.7);
             box-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
             outline: none;
+        }
+        
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: rgba(156, 163, 175, 0.5);
+        }
+        
+        .accommodation-card {
+            background: rgba(22, 33, 62, 0.5);
+            border: 2px solid rgba(14, 165, 233, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .accommodation-card:hover {
+            border-color: rgba(14, 165, 233, 0.7);
+            transform: translateY(-3px);
+        }
+        
+        .accommodation-card.selected {
+            border-color: #0ea5e9;
+            background: rgba(14, 165, 233, 0.15);
+        }
+        
+        .radio-custom {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(14, 165, 233, 0.5);
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            margin-right: 8px;
+        }
+        
+        .radio-custom:checked {
+            border-color: #0ea5e9;
+        }
+        
+        .radio-custom:checked::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #0ea5e9;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         
         .nav-link {
@@ -98,9 +150,20 @@
             transition: all 0.3s ease;
         }
         
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(14, 165, 233, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(14, 165, 233, 0.15);
+            border: 2px solid rgba(14, 165, 233, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(14, 165, 233, 0.25);
+            border-color: #0ea5e9;
         }
     </style>
 </head>
@@ -123,7 +186,7 @@
                 <a href="destinations.html" class="nav-link hover:text-neon-blue transition-colors">Destinations</a>
                 <a href="booking.html" class="nav-link hover:text-neon-blue transition-colors text-neon-blue">Booking</a>
                 <a href="about.html" class="nav-link hover:text-neon-blue transition-colors">About</a>
-                <a href="login.html" class="nav-link hover:text-neon-blue transition-colors ">Login</a>
+                <a href="login.html" class="nav-link hover:text-neon-blue transition-colors">Login</a>
             </div>
             
             <div class="md:hidden">
@@ -137,89 +200,135 @@
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 relative z-10">
         <!-- Hero Section -->
-        <section class="py-16 md:py-24 text-center">
-            <h1 class="font-orbitron text-4xl md:text-6xl font-bold mb-6 text-glow">Book Your Space Journey</h1>
-            <p class="text-xl md:text-2xl max-w-2xl mx-auto mb-10 text-gray-300">
-                Begin your adventure ti the stars. Fill out the form below to reserve your spot on our next space voyage.
+        <section class="py-12 text-center">
+            <h1 class="font-orbitron text-4xl md:text-5xl font-bold mb-4 text-glow">Book Your Space Journey</h1>
+            <p class="text-lg md:text-xl max-w-2xl mx-auto text-gray-300">
+                Begin your adventure to the stars. Fill out the form below to reserve your spot on our next space voyage.
             </p>
         </section>
 
-        <div class="max-w-md mx-auto py-12">
-            <!-- Login Card -->
-            <div class="login-card p-8">
-                <div class=" mb-8">
-                    <h1 class="font-orbitron text-3xl mb-2 text-glow">Journey Details</h1>
-                </div>
-                
-                <form class="space-y-6">
+        <div class="max-w-3xl mx-auto pb-12">
+            <!-- Booking Form -->
+            <div class="booking-card p-6 md:p-8">
+                <form id="bookingForm" class="space-y-6">
+                    
+                    <!-- Journey Details -->
                     <div>
-                        <label class="block text-gray-300 mb-2">Destinations</label>
-                        <select name="Destination" class="form-input w-full px-4 py-3" id="destination">
-                            <option value="">Select your destination</option>
-                            <option value="">Moon</option>
-                            <option value="">Mars</option>
-                            <option value="">Europa</option>
-                            <option value="">Titan</option>
-                            <option value="">Orbital Station</option>
-                            <option value="">Venus Cloud Cities</option>
-                        </select>
-                       
-                    </div>
-                    <div>
-                        <label class="block text-gray-300 mb-2">Departure Date</label>
-                        <input type="date" class="form-input w-full px-4 py-3" id="departure_date" placeholder="dd-mm-yyyy">
+                        <h2 class="font-orbitron text-2xl mb-4 text-glow">Journey Details</h2>
                         
+                        <!-- Destination -->
+                        <div class="mb-4">
+                            <label class="block text-gray-300 mb-2 text-sm">Destination</label>
+                            <select class="form-select w-full px-4 py-3" id="destination" required>
+                                <option value="">Select your destination</option>
+                                <option value="Moon">Moon</option>
+                                <option value="Mars">Mars</option>
+                                <option value="Europa">Europa</option>
+                                <option value="Titan">Titan</option>
+                                <option value="Orbital Station">Orbital Station</option>
+                                <option value="Venus Cloud Cities">Venus Cloud Cities</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Departure Date -->
+                        <div class="mb-4">
+                            <label class="block text-gray-300 mb-2 text-sm">Departure Date</label>
+                            <input type="date" class="form-input w-full px-4 py-3" id="departureDate" required>
+                        </div>
+                        
+                        <!-- Number of Passengers -->
+                        <div class="mb-4">
+                            <label class="block text-gray-300 mb-3 text-sm">Number of Passengers</label>
+                            <div class="flex flex-wrap gap-6">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="passengers" value="Solo" class="radio-custom" checked>
+                                    <span class="text-gray-300">Solo Traveler</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="passengers" value="Couple" class="radio-custom">
+                                    <span class="text-gray-300">Couple (2)</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="passengers" value="Group" class="radio-custom">
+                                    <span class="text-gray-300">Group (3-6)</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Accommodation Type -->
+                        <div class="mb-4">
+                            <label class="block text-gray-300 mb-3 text-sm">Accommodation Type</label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="accommodation-card selected" data-accommodation="standard">
+                                    <h3 class="font-orbitron text-base mb-2 text-neon-blue">Standard Cabin</h3>
+                                    <p class="text-xs text-gray-400">Comfortable private quarters with basic amenities</p>
+                                </div>
+                                <div class="accommodation-card" data-accommodation="luxury">
+                                    <h3 class="font-orbitron text-base mb-2 text-neon-blue">Luxury Suite</h3>
+                                    <p class="text-xs text-gray-400">Spacious suite with premium amenities and viewports</p>
+                                </div>
+                                <div class="accommodation-card" data-accommodation="zero-g">
+                                    <h3 class="font-orbitron text-base mb-2 text-neon-blue">Zero-G Pod</h3>
+                                    <p class="text-xs text-gray-400">Advanced accommodation with zero-gravity experience</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
+
+                    <!-- Personal Information -->
                     <div>
-                        <label class="block text-gray-300 mb-2">Number of Passengers</label>
-                        <input type="radio" id="solo" name="nbr_passenger" value="Solo">
-                        <label for="solo">Solo Traveler</label>
-                        <input type="radio" id="couple" name="nbr_passenger" value="Couple">
-                        <label for="couple">Couple (2)</label>
-                        <input type="radio" id="group" name="nbr_passenger" value="Group">
-                        <label for="couple">Group (3-6)</label>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-gray-300 mb-2">Accommodation Type</label>
-                        <!-- <div class="accommod_type">
-
-                        </div> -->
-                    </div>
-
-                    <div class=" mb-8">
-                        <h1 class="font-orbitron text-3xl mb-2 text-glow">Personal Information</h1>
-                        <label class="block text-gray-300 mb-2">First Name</label>
-                        <input type="text" class="form-input w-full px-4 py-3" id="first_name" placeholder="Enter your first name">
-                        <label class="block text-gray-300 mb-2">Last Name</label>
-                        <input type="text" class="form-input w-full px-4 py-3" id="last_name" placeholder="Enter your last name">
-                        <label class="block text-gray-300 mb-2">Email Address</label>
-                        <input type="text" class="form-input w-full px-4 py-3" id="email_add" placeholder="Enter your email">
-                        <label class="block text-gray-300 mb-2">Phone Number</label>
-                        <input type="text" class="form-input w-full px-4 py-3" id="phone_num" placeholder="Enter your phone number">
-                        <label class="block text-gray-300 mb-2">Special Requirements</label>
-                        <textarea type="text" class="form-input w-full px-4 py-3" id="last_name" placeholder="Any special requirements or notes..." maxlength="50000"> </textarea>
-
-
+                        <h2 class="font-orbitron text-2xl mb-4 text-glow">Personal Information</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-gray-300 mb-2 text-sm">First Name</label>
+                                <input type="text" class="form-input w-full px-4 py-3" id="firstName" placeholder="Enter your first name" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 mb-2 text-sm">Last Name</label>
+                                <input type="text" class="form-input w-full px-4 py-3" id="lastName" placeholder="Enter your last name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-gray-300 mb-2 text-sm">Email Address</label>
+                                <input type="email" class="form-input w-full px-4 py-3" id="email" placeholder="Enter your email" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 mb-2 text-sm">Phone Number</label>
+                                <input type="tel" class="form-input w-full px-4 py-3" id="phone" placeholder="Enter your phone number" required>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-300 mb-2 text-sm">Special Requirements</label>
+                            <textarea class="form-textarea w-full px-4 py-3" id="specialReq" rows="4" placeholder="Any special requirements or notes..." maxlength="500"></textarea>
+                        </div>
                     </div>
 
-                    <button type="submit" class="text-white w-full py-3 rounded-lg font-bold glow">
-                        Add Passanger
-                    </button>
-                    <button type="submit" class="btn-primary text-white w-full py-3 rounded-lg font-bold glow">
-                        Confirm Booking
-                    </button>
+                    <!-- Buttons -->
+                    <div class="space-y-3 pt-2">
+                        <button type="button" id="addPassengerBtn" class="btn-secondary text-white w-full py-3 rounded-lg font-semibold">
+                            Add Passenger
+                        </button>
+                        <button type="submit" class="btn-primary text-white w-full py-3 rounded-lg font-semibold glow">
+                            Confirm Booking
+                        </button>
+                    </div>
                 </form>
-                <div>
-                    By confirming, you agree to our <span style="color: #0ea5e9;">Terms of Service</span> and <span style="color: #0ea5e9;">Space Travel Agreement.</span>
-                </div>                
+                
+                <div class="mt-6 text-center text-gray-400 text-sm">
+                    By confirming, you agree to our 
+                    <a href="#" class="text-neon-blue hover:underline">Terms of Service</a> and 
+                    <a href="#" class="text-neon-blue hover:underline">Space Travel Agreement</a>.
+                </div>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-space-dark border-t border-neon-blue/20 py-8 mt-12 relative z-10">
+    <footer class="bg-space-dark border-t border-neon-blue/20 py-8 relative z-10">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
@@ -232,7 +341,7 @@
                     <p class="text-gray-400 text-sm">© 2023 SpaceVoyager. All rights reserved.</p>
                 </div>
                 
-                <div class="flex space-x-6 mb-4 md:mb-0">
+                <div class="flex space-x-6">
                     <a href="#" class="text-gray-400 hover:text-neon-blue transition-colors text-xl">
                         <i class="fab fa-twitter"></i>
                     </a>
@@ -246,6 +355,121 @@
             </div>
         </div>
     </footer>
+
+    <!-- <script>
+        // Create stars background
+        function createStars() {
+            const container = document.getElementById('stars-container');
+            const starCount = 150;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                
+                container.appendChild(star);
+            }
+        }
+        
+        // Accommodation selection
+        const accommodationCards = document.querySelectorAll('.accommodation-card');
+        let selectedAccommodation = 'standard';
+        
+        accommodationCards.forEach(card => {
+            card.addEventListener('click', () => {
+                accommodationCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedAccommodation = card.dataset.accommodation;
+            });
+        });
+        
+        // Passengers array
+        let passengers = [];
+        
+        // Add passenger
+        document.getElementById('addPassengerBtn').addEventListener('click', () => {
+            const passenger = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                specialReq: document.getElementById('specialReq').value
+            };
+            
+            if (passenger.firstName && passenger.lastName && passenger.email && passenger.phone) {
+                passengers.push(passenger);
+                alert(`Passenger ${passenger.firstName} ${passenger.lastName} added successfully!`);
+                
+                // Clear personal info fields
+                document.getElementById('firstName').value = '';
+                document.getElementById('lastName').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('phone').value = '';
+                document.getElementById('specialReq').value = '';
+            } else {
+                alert('Please fill all required fields');
+            }
+        });
+        
+        // Form submission
+        document.getElementById('bookingForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get current passenger if fields are filled
+            const currentPassenger = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                specialReq: document.getElementById('specialReq').value
+            };
+            
+            if (currentPassenger.firstName && currentPassenger.lastName && currentPassenger.email && currentPassenger.phone) {
+                passengers.push(currentPassenger);
+            }
+            
+            if (passengers.length === 0) {
+                alert('Please add at least one passenger');
+                return;
+            }
+            
+            const booking = {
+                destination: document.getElementById('destination').value,
+                departureDate: document.getElementById('departureDate').value,
+                numberOfPassengers: document.querySelector('input[name="passengers"]:checked').value,
+                accommodation: selectedAccommodation,
+                passengers: passengers,
+                bookingDate: new Date().toISOString()
+            };
+            
+            // Save to localStorage
+            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            bookings.push(booking);
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+            
+            alert('Booking confirmed! Thank you for choosing SpaceVoyager.');
+            
+            // Reset form
+            document.getElementById('bookingForm').reset();
+            passengers = [];
+            accommodationCards.forEach(c => c.classList.remove('selected'));
+            accommodationCards[0].classList.add('selected');
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+        });
+    </script>
+</body>
+</html> -->
 
     <script>
         // Create stars background
