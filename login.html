@@ -108,6 +108,9 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(14, 165, 233, 0.4);
         }
+        .disable_btn{
+            background: none;
+        }
     </style>
 </head>
 <body class="text-white font-exo min-h-screen">
@@ -164,7 +167,7 @@
                         <label class="block text-gray-300 mb-2">Password</label>
                         <input type="password" class="form-input w-full px-4 py-3" id="password" placeholder="Enter your password">
                         <small class="msg_err_password"></small>
-
+                        
                     </div>
                     
                     <div class="flex items-center justify-between">
@@ -178,6 +181,8 @@
                     <button type="submit" class="btn-primary text-white w-full py-3 rounded-lg font-bold glow btn_submit">
                         Login to Account
                     </button>
+                    <small class="login_err"></small>
+
                 </form>
                 
                 <div class="mt-6 pt-6 border-t border-neon-blue/20">
@@ -286,7 +291,18 @@
         const msgErrPassword = document.querySelector(".msg_err_password");
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$%#*&\-]).{8,}$/;
         const emailRegex = /^\w+@[a-z]+\.[a-z]{2,}$/;
-        const submitBtn=document.getElementByClass("btn_submit");
+        const submitBtn=form.querySelector(".btn_submit");
+        const loginErro=document.querySelector(".login_err")
+        
+        //Base de bonnées 
+        const users = [
+            {email: "nourtajat@gmail.com" , password: "Azert--123"},
+            {email: "youcode@gmail.com" , password: "Youcode--123"},
+            {email: "gryffindorelit@gmail.com" , password: "griff--123"}
+        ];
+        function checkUsers(emailValue, passwordValue){
+            return users.find(user=> user.email===emailValue && user.password===passwordValue);
+        };
 
         function setValid(input){
             input.classList.add('valid');
@@ -298,22 +314,23 @@
         };
         function validInput(input, regex,msgErro){
             if(input.value.trim()===""){
-                msgErro.textContent = 'This field is required '
+                msgErro.textContent = 'This field is required ';
                 msgErro.style.color='red';
                 setInvalid(input);
                 return false;
             } else if (!regex.test(input.value)) {
-                msgErro.textContent=' Invalid inputs'
+                msgErro.textContent=' Invalid inputs';
                 msgErro.style.color='red';
                 setInvalid(input);
                 return false;
             } else {
-                msgErro.textContent=''
+                msgErro.textContent='';
                 msgErro.style.color='green';
                 setValid(input);
                 return true;
             }
         }
+
         email.addEventListener('input',()=> validInput(email,emailRegex,msgErrEmail));
         password.addEventListener('input', ()=> validInput(password,passwordRegex,msgErrPassword));
         form.addEventListener('submit', (e) => {
@@ -321,14 +338,33 @@
             const validEmail= validInput(email,emailRegex,msgErrEmail);
             const validPassword=validInput(password,passwordRegex,msgErrPassword);
             if(validEmail && validPassword){
-                alert('Login successful !');
-            }
-            form.reset();
-            email.classList.remove('valid', 'invalid');
-            password.classList.remove('valid', 'invalid');
-        });
-        
+                const user = checkUsers(email.value, password.value);
+                if(user){
+                    localStorage.setItem('userEmail', email.value);
+                    alert('Login successful !');
 
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                    submitBtn.classList.add('.disable_btn');
+                }else{
+                    setTimeout(()=>{
+                        loginErro.textContent='Incorrect email or password';
+                        loginErro.style.color='red';
+                        
+                    }, 60000)
+                    setInvalid(email);
+                    setInvalid(password);
+                    form.reset();
+                    email.classList.remove('valid', 'invalid');
+                    password.classList.remove('valid', 'invalid');
+                    // submitBtn.disabled = true; 
+                }
+            }
+            submitBtn.classList.remove('btn-primary');
+            form.reset();                               
+
+        });
         
     </script>
 </body>
