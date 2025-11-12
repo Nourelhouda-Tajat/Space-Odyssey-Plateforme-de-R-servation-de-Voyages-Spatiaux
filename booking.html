@@ -255,23 +255,14 @@
                             </div>
                         </div>
                         
-                        <!-- Accommodation Type -->
-                        <div class="mb-4">
-                            <label class="block text-gray-300 mb-3 text-sm">Accommodation Type</label>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="accommodation-card selected" data-accommodation="standard">
-                                    <h3 class="font-orbitron text-base mb-2 text-neon-blue">Standard Cabin</h3>
-                                    <p class="text-xs text-gray-400">Comfortable private quarters with basic amenities</p>
-                                </div>
-                                <div class="accommodation-card" data-accommodation="luxury">
-                                    <h3 class="font-orbitron text-base mb-2 text-neon-blue">Luxury Suite</h3>
-                                    <p class="text-xs text-gray-400">Spacious suite with premium amenities and viewports</p>
-                                </div>
-                                <div class="accommodation-card" data-accommodation="zero-g">
-                                    <h3 class="font-orbitron text-base mb-2 text-neon-blue">Zero-G Pod</h3>
-                                    <p class="text-xs text-gray-400">Advanced accommodation with zero-gravity experience</p>
-                                </div>
-                            </div>
+                        <!-- Package Selection (Dynamic) -->
+                        <div class="mb-4" id="packageContainer">
+                            <p class="text-gray-400 text-sm">Please select a destination first</p>
+                        </div>
+                        
+                        <!-- Accommodation Type (Dynamic) -->
+                        <div class="mb-4" id="accommodationContainer">
+                            <p class="text-gray-400 text-sm">Please select a package first</p>
                         </div>
                     </div>
 
@@ -356,7 +347,95 @@
         </div>
     </footer>
 
-    <!-- <script>
+    <script>
+        // Data JSON (normalement chargé depuis data.json)
+        const data = {
+            "destinations": [
+                {
+                    "id": "moon",
+                    "name": "Moon",
+                    "description": "Earth's natural satellite - perfect for first-time space travelers",
+                    "packages": [
+                        {
+                            "id": "moon-basic",
+                            "name": "Lunar Explorer",
+                            "price": 50000,
+                            "duration": "3 days",
+                            "description": "Basic lunar experience with surface walks",
+                            "accommodations": ["Standard Cabin"]
+                        },
+                        {
+                            "id": "moon-premium",
+                            "name": "Moonwalker Premium",
+                            "price": 85000,
+                            "duration": "5 days",
+                            "description": "Extended stay with advanced activities",
+                            "accommodations": ["Standard Cabin", "Luxury Suite"]
+                        },
+                        {
+                            "id": "moon-vip",
+                            "name": "Lunar VIP Experience",
+                            "price": 150000,
+                            "duration": "7 days",
+                            "description": "Ultimate lunar adventure",
+                            "accommodations": ["Luxury Suite", "Zero-G Pod"]
+                        }
+                    ]
+                },
+                {
+                    "id": "mars",
+                    "name": "Mars",
+                    "description": "The Red Planet - for adventurous explorers",
+                    "packages": [
+                        {
+                            "id": "mars-pioneer",
+                            "name": "Mars Pioneer",
+                            "price": 500000,
+                            "duration": "9 months",
+                            "description": "First-time Mars colonist experience",
+                            "accommodations": ["Standard Cabin"]
+                        },
+                        {
+                            "id": "mars-explorer",
+                            "name": "Red Planet Explorer",
+                            "price": 750000,
+                            "duration": "12 months",
+                            "description": "Comprehensive Mars exploration",
+                            "accommodations": ["Standard Cabin", "Luxury Suite"]
+                        }
+                    ]
+                },
+                {
+                    "id": "orbital-station",
+                    "name": "Orbital Station",
+                    "description": "Low Earth Orbit - perfect introduction to space",
+                    "packages": [
+                        {
+                            "id": "orbital-tourist",
+                            "name": "Space Tourist",
+                            "price": 25000,
+                            "duration": "3 days",
+                            "description": "Basic orbital experience",
+                            "accommodations": ["Standard Cabin"]
+                        },
+                        {
+                            "id": "orbital-extended",
+                            "name": "Extended Orbital Stay",
+                            "price": 45000,
+                            "duration": "7 days",
+                            "description": "Week-long orbital adventure",
+                            "accommodations": ["Standard Cabin", "Luxury Suite", "Zero-G Pod"]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        let selectedDestination = null;
+        let selectedPackage = null;
+        let selectedAccommodation = 'standard';
+        let passengers = [];
+
         // Create stars background
         function createStars() {
             const container = document.getElementById('stars-container');
@@ -378,22 +457,133 @@
                 container.appendChild(star);
             }
         }
-        
-        // Accommodation selection
-        const accommodationCards = document.querySelectorAll('.accommodation-card');
-        let selectedAccommodation = 'standard';
-        
-        accommodationCards.forEach(card => {
-            card.addEventListener('click', () => {
-                accommodationCards.forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                selectedAccommodation = card.dataset.accommodation;
+
+        // Populate destinations
+        function populateDestinations() {
+            const select = document.getElementById('destination');
+            select.innerHTML = '<option value="">Select your destination</option>';
+            
+            data.destinations.forEach(dest => {
+                const option = document.createElement('option');
+                option.value = dest.id;
+                option.textContent = dest.name;
+                select.appendChild(option);
             });
+        }
+
+        // Update packages based on destination
+        function updatePackages(destinationId) {
+            const packageContainer = document.getElementById('packageContainer');
+            
+            if (!destinationId) {
+                packageContainer.innerHTML = '<p class="text-gray-400 text-sm">Please select a destination first</p>';
+                updateAccommodations([]);
+                return;
+            }
+
+            selectedDestination = data.destinations.find(d => d.id === destinationId);
+            
+            packageContainer.innerHTML = '<label class="block text-gray-300 mb-3 text-sm">Select Package</label>';
+            
+            const packagesGrid = document.createElement('div');
+            packagesGrid.className = 'grid grid-cols-1 gap-3';
+            
+            selectedDestination.packages.forEach(pkg => {
+                const card = document.createElement('div');
+                card.className = 'accommodation-card cursor-pointer';
+                card.dataset.packageId = pkg.id;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-orbitron text-base text-neon-blue">${pkg.name}</h3>
+                        <span class="text-neon-cyan font-semibold">${pkg.price.toLocaleString()}</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-1">${pkg.description}</p>
+                    <p class="text-xs text-gray-500">Duration: ${pkg.duration}</p>
+                `;
+                
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('#packageContainer .accommodation-card').forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    card.classList.add('selected');
+                    selectedPackage = pkg;
+                    updateAccommodations(pkg.accommodations);
+                });
+                
+                packagesGrid.appendChild(card);
+            });
+            
+            packageContainer.appendChild(packagesGrid);
+        }
+
+        // Update accommodations based on package
+        function updateAccommodations(allowedAccommodations) {
+            const accommodationContainer = document.getElementById('accommodationContainer');
+            
+            if (allowedAccommodations.length === 0) {
+                accommodationContainer.innerHTML = '<p class="text-gray-400 text-sm">Please select a package first</p>';
+                return;
+            }
+
+            accommodationContainer.innerHTML = '<label class="block text-gray-300 mb-3 text-sm">Accommodation Type</label>';
+            
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
+            
+            const allAccommodations = [
+                {
+                    id: 'standard',
+                    name: 'Standard Cabin',
+                    desc: 'Comfortable private quarters with basic amenities'
+                },
+                {
+                    id: 'luxury',
+                    name: 'Luxury Suite',
+                    desc: 'Spacious suite with premium amenities'
+                },
+                {
+                    id: 'zero-g',
+                    name: 'Zero-G Pod',
+                    desc: 'Advanced accommodation with zero-gravity'
+                }
+            ];
+            
+            allAccommodations.forEach(acc => {
+                const isAllowed = allowedAccommodations.includes(acc.name);
+                
+                const card = document.createElement('div');
+                card.className = `accommodation-card ${isAllowed ? '' : 'opacity-50 cursor-not-allowed'}`;
+                if (isAllowed && acc.id === 'standard') {
+                    card.classList.add('selected');
+                }
+                card.dataset.accommodation = acc.id;
+                card.innerHTML = `
+                    <h3 class="font-orbitron text-base mb-2 text-neon-blue">${acc.name}</h3>
+                    <p class="text-xs text-gray-400">${acc.desc}</p>
+                    ${!isAllowed ? '<p class="text-xs text-red-400 mt-2">Not available for this package</p>' : ''}
+                `;
+                
+                if (isAllowed) {
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('#accommodationContainer .accommodation-card').forEach(c => {
+                            c.classList.remove('selected');
+                        });
+                        card.classList.add('selected');
+                        selectedAccommodation = acc.id;
+                    });
+                }
+                
+                grid.appendChild(card);
+            });
+            
+            accommodationContainer.appendChild(grid);
+        }
+
+        // Destination change handler
+        document.getElementById('destination').addEventListener('change', (e) => {
+            updatePackages(e.target.value);
         });
-        
-        // Passengers array
-        let passengers = [];
-        
+
         // Add passenger
         document.getElementById('addPassengerBtn').addEventListener('click', () => {
             const passenger = {
@@ -408,7 +598,6 @@
                 passengers.push(passenger);
                 alert(`Passenger ${passenger.firstName} ${passenger.lastName} added successfully!`);
                 
-                // Clear personal info fields
                 document.getElementById('firstName').value = '';
                 document.getElementById('lastName').value = '';
                 document.getElementById('email').value = '';
@@ -418,12 +607,16 @@
                 alert('Please fill all required fields');
             }
         });
-        
+
         // Form submission
         document.getElementById('bookingForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
-            // Get current passenger if fields are filled
+            if (!selectedPackage) {
+                alert('Please select a package');
+                return;
+            }
+
             const currentPassenger = {
                 firstName: document.getElementById('firstName').value,
                 lastName: document.getElementById('lastName').value,
@@ -442,60 +635,33 @@
             }
             
             const booking = {
-                destination: document.getElementById('destination').value,
+                destination: selectedDestination.name,
+                package: selectedPackage.name,
+                packagePrice: selectedPackage.price,
                 departureDate: document.getElementById('departureDate').value,
                 numberOfPassengers: document.querySelector('input[name="passengers"]:checked').value,
                 accommodation: selectedAccommodation,
                 passengers: passengers,
+                totalPrice: selectedPackage.price * passengers.length,
                 bookingDate: new Date().toISOString()
             };
             
-            // Save to localStorage
             const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
             bookings.push(booking);
             localStorage.setItem('bookings', JSON.stringify(bookings));
             
-            alert('Booking confirmed! Thank you for choosing SpaceVoyager.');
+            alert(`Booking confirmed!\nTotal: ${booking.totalPrice.toLocaleString()}\nThank you for choosing SpaceVoyager.`);
             
-            // Reset form
             document.getElementById('bookingForm').reset();
             passengers = [];
-            accommodationCards.forEach(c => c.classList.remove('selected'));
-            accommodationCards[0].classList.add('selected');
+            selectedPackage = null;
+            updatePackages(null);
         });
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            createStars();
-        });
-    </script>
-</body>
-</html> -->
 
-    <script>
-        // Create stars background
-        function createStars() {
-            const container = document.getElementById('stars-container');
-            const starCount = 150;
-            
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.classList.add('star');
-                
-                const size = Math.random() * 2 + 1;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                
-                star.style.animationDelay = `${Math.random() * 5}s`;
-                
-                container.appendChild(star);
-            }
-        }
-        
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
+            populateDestinations();
+            updatePackages(null);
         });
     </script>
 </body>
