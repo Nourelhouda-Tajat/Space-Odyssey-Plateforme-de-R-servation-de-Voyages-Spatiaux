@@ -147,7 +147,7 @@
         <div class="max-w-md mx-auto py-12">
             <!-- Login Card -->
             <div class="login-card p-8">
-                <div class="text-center mb-8">
+                <div class=" mb-8">
                     <h1 class="font-orbitron text-3xl mb-2 text-glow">Journey Details</h1>
                 </div>
                 
@@ -181,58 +181,39 @@
                         <label for="couple">Group (3-6)</label>
                     </div>
                     
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="remember" class="mr-2">
-                            <label for="remember" class="text-gray-300 text-sm">Remember me</label>
-                        </div>
-                        <a href="#" class="text-neon-blue text-sm hover:underline">Forgot password?</a>
+                    <div>
+                        <label class="block text-gray-300 mb-2">Accommodation Type</label>
+                        <!-- <div class="accommod_type">
+
+                        </div> -->
                     </div>
-                    
+
+                    <div class=" mb-8">
+                        <h1 class="font-orbitron text-3xl mb-2 text-glow">Personal Information</h1>
+                        <label class="block text-gray-300 mb-2">First Name</label>
+                        <input type="text" class="form-input w-full px-4 py-3" id="first_name" placeholder="Enter your first name">
+                        <label class="block text-gray-300 mb-2">Last Name</label>
+                        <input type="text" class="form-input w-full px-4 py-3" id="last_name" placeholder="Enter your last name">
+                        <label class="block text-gray-300 mb-2">Email Address</label>
+                        <input type="text" class="form-input w-full px-4 py-3" id="email_add" placeholder="Enter your email">
+                        <label class="block text-gray-300 mb-2">Phone Number</label>
+                        <input type="text" class="form-input w-full px-4 py-3" id="phone_num" placeholder="Enter your phone number">
+                        <label class="block text-gray-300 mb-2">Special Requirements</label>
+                        <textarea type="text" class="form-input w-full px-4 py-3" id="last_name" placeholder="Any special requirements or notes..." maxlength="50000"> </textarea>
+
+
+                    </div>
+
+                    <button type="submit" class="text-white w-full py-3 rounded-lg font-bold glow">
+                        Add Passanger
+                    </button>
                     <button type="submit" class="btn-primary text-white w-full py-3 rounded-lg font-bold glow">
-                        Login to Account
+                        Confirm Booking
                     </button>
                 </form>
-                
-                <div class="mt-6 pt-6 border-t border-neon-blue/20">
-                    <p class="text-gray-400 text-center">
-                        Don't have an account? 
-                        <a href="#" class="text-neon-blue hover:underline">Sign up now</a>
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Features -->
-            <div class="mt-12 grid grid-cols-1 gap-6">
-                <div class="flex items-start">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-neon-cyan to-neon-blue flex items-center justify-center mr-4 mt-1">
-                        <i class="fas fa-ticket-alt text-white"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-orbitron text-lg mb-1">Manage Your Bookings</h3>
-                        <p class="text-gray-300 text-sm">View and modify your upcoming space journeys</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-start">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-neon-purple to-pink-500 flex items-center justify-center mr-4 mt-1">
-                        <i class="fas fa-user-check text-white"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-orbitron text-lg mb-1">Training Progress</h3>
-                        <p class="text-gray-300 text-sm">Track your space travel preparation status</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-start">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 flex items-center justify-center mr-4 mt-1">
-                        <i class="fas fa-star text-white"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-orbitron text-lg mb-1">Voyager Rewards</h3>
-                        <p class="text-gray-300 text-sm">Earn points and unlock exclusive benefits</p>
-                    </div>
-                </div>
+                <div>
+                    By confirming, you agree to our <span style="color: #0ea5e9;">Terms of Service</span> and <span style="color: #0ea5e9;">Space Travel Agreement.</span>
+                </div>                
             </div>
         </div>
     </main>

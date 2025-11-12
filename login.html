@@ -342,26 +342,23 @@
                 if(user){
                     localStorage.setItem('userEmail', email.value);
                     alert('Login successful !');
+                    submitBtn.classList.remove('btn-primary');
+                    submitBtn.classList.add('.disable_btn');
 
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 1000);
-                    submitBtn.classList.add('.disable_btn');
                 }else{
-                    setTimeout(()=>{
                         loginErro.textContent='Incorrect email or password';
                         loginErro.style.color='red';
                         
-                    }, 60000)
                     setInvalid(email);
                     setInvalid(password);
                     form.reset();
                     email.classList.remove('valid', 'invalid');
                     password.classList.remove('valid', 'invalid');
-                    // submitBtn.disabled = true; 
                 }
             }
-            submitBtn.classList.remove('btn-primary');
             form.reset();                               
 
         });
