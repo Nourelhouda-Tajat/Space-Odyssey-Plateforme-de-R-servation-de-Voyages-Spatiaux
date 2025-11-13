@@ -165,6 +165,15 @@
             background: rgba(14, 165, 233, 0.25);
             border-color: #0ea5e9;
         }
+        .mobile-menu {
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+        
+        .mobile-menu.open {
+            max-height: 300px;
+        }
     </style>
 </head>
 <body class="text-white font-exo min-h-screen">
@@ -189,11 +198,22 @@
                 <a href="login.html" class="nav-link hover:text-neon-blue transition-colors">Login</a>
             </div>
             
+            <!-- Mobile menu button -->
             <div class="md:hidden">
-                <button class="text-white focus:outline-none">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
             </div>
+            <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu md:hidden bg-space-dark/90 backdrop-blur-md">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+                <a href="index.html" class="hover:text-neon-blue transition-colors py-2 border-b border-neon-blue/20">Home</a>
+                <a href="destinations.html" class="hover:text-neon-blue transition-colors py-2 border-b border-neon-blue/20">Destinations</a>
+                <a href="booking.html" class="hover:text-neon-blue transition-colors py-2 border-b border-neon-blue/20">Booking</a>
+                <a href="about.html" class="hover:text-neon-blue transition-colors py-2 border-b border-neon-blue/20">About</a>
+                <a href="login.html" class="hover:text-neon-blue transition-colors py-2">Login</a>
+            </div>
+        </div>
         </div>
     </nav>
 
@@ -221,12 +241,12 @@
                             <label class="block text-gray-300 mb-2 text-sm">Destination</label>
                             <select class="form-select w-full px-4 py-3" id="destination" required>
                                 <option value="">Select your destination</option>
-                                <option value="Moon">Moon</option>
+                                <!-- <option value="Moon">Moon</option>
                                 <option value="Mars">Mars</option>
                                 <option value="Europa">Europa</option>
                                 <option value="Titan">Titan</option>
                                 <option value="Orbital Station">Orbital Station</option>
-                                <option value="Venus Cloud Cities">Venus Cloud Cities</option>
+                                <option value="Venus Cloud Cities">Venus Cloud Cities</option> -->
                             </select>
                         </div>
                         
@@ -255,16 +275,13 @@
                             </div>
                         </div>
                         
-                        <!-- Package Selection (Dynamic) -->
-                        <div class="mb-4" id="packageContainer">
-                            <p class="text-gray-400 text-sm">Please select a destination first</p>
-                        </div>
                         
                         <!-- Accommodation Type (Dynamic) -->
                         <div class="mb-4" id="accommodationContainer">
-                            <p class="text-gray-400 text-sm">Please select a package first</p>
                         </div>
                     </div>
+
+                    <div class="border-b border-blue-500"></div>
 
                     <!-- Personal Information -->
                     <div>
@@ -347,95 +364,7 @@
         </div>
     </footer>
 
-    <script>
-        // Data JSON (normalement chargé depuis data.json)
-        const data = {
-            "destinations": [
-                {
-                    "id": "moon",
-                    "name": "Moon",
-                    "description": "Earth's natural satellite - perfect for first-time space travelers",
-                    "packages": [
-                        {
-                            "id": "moon-basic",
-                            "name": "Lunar Explorer",
-                            "price": 50000,
-                            "duration": "3 days",
-                            "description": "Basic lunar experience with surface walks",
-                            "accommodations": ["Standard Cabin"]
-                        },
-                        {
-                            "id": "moon-premium",
-                            "name": "Moonwalker Premium",
-                            "price": 85000,
-                            "duration": "5 days",
-                            "description": "Extended stay with advanced activities",
-                            "accommodations": ["Standard Cabin", "Luxury Suite"]
-                        },
-                        {
-                            "id": "moon-vip",
-                            "name": "Lunar VIP Experience",
-                            "price": 150000,
-                            "duration": "7 days",
-                            "description": "Ultimate lunar adventure",
-                            "accommodations": ["Luxury Suite", "Zero-G Pod"]
-                        }
-                    ]
-                },
-                {
-                    "id": "mars",
-                    "name": "Mars",
-                    "description": "The Red Planet - for adventurous explorers",
-                    "packages": [
-                        {
-                            "id": "mars-pioneer",
-                            "name": "Mars Pioneer",
-                            "price": 500000,
-                            "duration": "9 months",
-                            "description": "First-time Mars colonist experience",
-                            "accommodations": ["Standard Cabin"]
-                        },
-                        {
-                            "id": "mars-explorer",
-                            "name": "Red Planet Explorer",
-                            "price": 750000,
-                            "duration": "12 months",
-                            "description": "Comprehensive Mars exploration",
-                            "accommodations": ["Standard Cabin", "Luxury Suite"]
-                        }
-                    ]
-                },
-                {
-                    "id": "orbital-station",
-                    "name": "Orbital Station",
-                    "description": "Low Earth Orbit - perfect introduction to space",
-                    "packages": [
-                        {
-                            "id": "orbital-tourist",
-                            "name": "Space Tourist",
-                            "price": 25000,
-                            "duration": "3 days",
-                            "description": "Basic orbital experience",
-                            "accommodations": ["Standard Cabin"]
-                        },
-                        {
-                            "id": "orbital-extended",
-                            "name": "Extended Orbital Stay",
-                            "price": 45000,
-                            "duration": "7 days",
-                            "description": "Week-long orbital adventure",
-                            "accommodations": ["Standard Cabin", "Luxury Suite", "Zero-G Pod"]
-                        }
-                    ]
-                }
-            ]
-        };
-
-        let selectedDestination = null;
-        let selectedPackage = null;
-        let selectedAccommodation = 'standard';
-        let passengers = [];
-
+        <script>
         // Create stars background
         function createStars() {
             const container = document.getElementById('stars-container');
@@ -445,226 +374,36 @@
                 const star = document.createElement('div');
                 star.classList.add('star');
                 
+                // Random size between 1-3px
                 const size = Math.random() * 2 + 1;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
                 
+                // Random position
                 star.style.left = `${Math.random() * 100}%`;
                 star.style.top = `${Math.random() * 100}%`;
                 
+                // Random animation delay
                 star.style.animationDelay = `${Math.random() * 5}s`;
                 
                 container.appendChild(star);
             }
         }
-
-        // Populate destinations
-        function populateDestinations() {
-            const select = document.getElementById('destination');
-            select.innerHTML = '<option value="">Select your destination</option>';
-            
-            data.destinations.forEach(dest => {
-                const option = document.createElement('option');
-                option.value = dest.id;
-                option.textContent = dest.name;
-                select.appendChild(option);
-            });
-        }
-
-        // Update packages based on destination
-        function updatePackages(destinationId) {
-            const packageContainer = document.getElementById('packageContainer');
-            
-            if (!destinationId) {
-                packageContainer.innerHTML = '<p class="text-gray-400 text-sm">Please select a destination first</p>';
-                updateAccommodations([]);
-                return;
-            }
-
-            selectedDestination = data.destinations.find(d => d.id === destinationId);
-            
-            packageContainer.innerHTML = '<label class="block text-gray-300 mb-3 text-sm">Select Package</label>';
-            
-            const packagesGrid = document.createElement('div');
-            packagesGrid.className = 'grid grid-cols-1 gap-3';
-            
-            selectedDestination.packages.forEach(pkg => {
-                const card = document.createElement('div');
-                card.className = 'accommodation-card cursor-pointer';
-                card.dataset.packageId = pkg.id;
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-orbitron text-base text-neon-blue">${pkg.name}</h3>
-                        <span class="text-neon-cyan font-semibold">${pkg.price.toLocaleString()}</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mb-1">${pkg.description}</p>
-                    <p class="text-xs text-gray-500">Duration: ${pkg.duration}</p>
-                `;
-                
-                card.addEventListener('click', () => {
-                    document.querySelectorAll('#packageContainer .accommodation-card').forEach(c => {
-                        c.classList.remove('selected');
-                    });
-                    card.classList.add('selected');
-                    selectedPackage = pkg;
-                    updateAccommodations(pkg.accommodations);
-                });
-                
-                packagesGrid.appendChild(card);
-            });
-            
-            packageContainer.appendChild(packagesGrid);
-        }
-
-        // Update accommodations based on package
-        function updateAccommodations(allowedAccommodations) {
-            const accommodationContainer = document.getElementById('accommodationContainer');
-            
-            if (allowedAccommodations.length === 0) {
-                accommodationContainer.innerHTML = '<p class="text-gray-400 text-sm">Please select a package first</p>';
-                return;
-            }
-
-            accommodationContainer.innerHTML = '<label class="block text-gray-300 mb-3 text-sm">Accommodation Type</label>';
-            
-            const grid = document.createElement('div');
-            grid.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
-            
-            const allAccommodations = [
-                {
-                    id: 'standard',
-                    name: 'Standard Cabin',
-                    desc: 'Comfortable private quarters with basic amenities'
-                },
-                {
-                    id: 'luxury',
-                    name: 'Luxury Suite',
-                    desc: 'Spacious suite with premium amenities'
-                },
-                {
-                    id: 'zero-g',
-                    name: 'Zero-G Pod',
-                    desc: 'Advanced accommodation with zero-gravity'
-                }
-            ];
-            
-            allAccommodations.forEach(acc => {
-                const isAllowed = allowedAccommodations.includes(acc.name);
-                
-                const card = document.createElement('div');
-                card.className = `accommodation-card ${isAllowed ? '' : 'opacity-50 cursor-not-allowed'}`;
-                if (isAllowed && acc.id === 'standard') {
-                    card.classList.add('selected');
-                }
-                card.dataset.accommodation = acc.id;
-                card.innerHTML = `
-                    <h3 class="font-orbitron text-base mb-2 text-neon-blue">${acc.name}</h3>
-                    <p class="text-xs text-gray-400">${acc.desc}</p>
-                    ${!isAllowed ? '<p class="text-xs text-red-400 mt-2">Not available for this package</p>' : ''}
-                `;
-                
-                if (isAllowed) {
-                    card.addEventListener('click', () => {
-                        document.querySelectorAll('#accommodationContainer .accommodation-card').forEach(c => {
-                            c.classList.remove('selected');
-                        });
-                        card.classList.add('selected');
-                        selectedAccommodation = acc.id;
-                    });
-                }
-                
-                grid.appendChild(card);
-            });
-            
-            accommodationContainer.appendChild(grid);
-        }
-
-        // Destination change handler
-        document.getElementById('destination').addEventListener('change', (e) => {
-            updatePackages(e.target.value);
+        
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('open');
         });
-
-        // Add passenger
-        document.getElementById('addPassengerBtn').addEventListener('click', () => {
-            const passenger = {
-                firstName: document.getElementById('firstName').value,
-                lastName: document.getElementById('lastName').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                specialReq: document.getElementById('specialReq').value
-            };
-            
-            if (passenger.firstName && passenger.lastName && passenger.email && passenger.phone) {
-                passengers.push(passenger);
-                alert(`Passenger ${passenger.firstName} ${passenger.lastName} added successfully!`);
-                
-                document.getElementById('firstName').value = '';
-                document.getElementById('lastName').value = '';
-                document.getElementById('email').value = '';
-                document.getElementById('phone').value = '';
-                document.getElementById('specialReq').value = '';
-            } else {
-                alert('Please fill all required fields');
-            }
-        });
-
-        // Form submission
-        document.getElementById('bookingForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            if (!selectedPackage) {
-                alert('Please select a package');
-                return;
-            }
-
-            const currentPassenger = {
-                firstName: document.getElementById('firstName').value,
-                lastName: document.getElementById('lastName').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                specialReq: document.getElementById('specialReq').value
-            };
-            
-            if (currentPassenger.firstName && currentPassenger.lastName && currentPassenger.email && currentPassenger.phone) {
-                passengers.push(currentPassenger);
-            }
-            
-            if (passengers.length === 0) {
-                alert('Please add at least one passenger');
-                return;
-            }
-            
-            const booking = {
-                destination: selectedDestination.name,
-                package: selectedPackage.name,
-                packagePrice: selectedPackage.price,
-                departureDate: document.getElementById('departureDate').value,
-                numberOfPassengers: document.querySelector('input[name="passengers"]:checked').value,
-                accommodation: selectedAccommodation,
-                passengers: passengers,
-                totalPrice: selectedPackage.price * passengers.length,
-                bookingDate: new Date().toISOString()
-            };
-            
-            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-            bookings.push(booking);
-            localStorage.setItem('bookings', JSON.stringify(bookings));
-            
-            alert(`Booking confirmed!\nTotal: ${booking.totalPrice.toLocaleString()}\nThank you for choosing SpaceVoyager.`);
-            
-            document.getElementById('bookingForm').reset();
-            passengers = [];
-            selectedPackage = null;
-            updatePackages(null);
-        });
-
+        
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
-            populateDestinations();
-            updatePackages(null);
         });
     </script>
+    <script src="booking.js"></script>
     <script src="login.js"></script>
+
 
 </body>
 </html>

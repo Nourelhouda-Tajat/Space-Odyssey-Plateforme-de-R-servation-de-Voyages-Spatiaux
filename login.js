@@ -24,22 +24,26 @@ function updateHeader() {
             let logoutBtn = document.getElementById('logout-btn-header');
             
             if (!logoutBtn) {
-                // Créer le bouton "Logout"
-                logoutBtn = document.createElement('a');
-                logoutBtn.id = 'logout-btn-header';
-                logoutBtn.href = '#';
-                logoutBtn.className = 'nav-link hover:text-red-500 transition-colors';
-                logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-1"></i> Logout';
-                logoutBtn.style.color = '#ef4444'; // Rouge
-                
-                // Ajouter le bouton après l'email
-                loginLink.parentNode.insertBefore(logoutBtn, loginLink.nextSibling);
-                
-                // Gérer le clic sur Logout
-                logoutBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    logout();
-                });
+              // Créer le bouton "Logout"
+              logoutBtn = document.createElement("a");
+              logoutBtn.id = "logout-btn-header";
+              logoutBtn.href = "#";
+              logoutBtn.className =
+                "nav-link hover:text-red-500 transition-colors";
+              logoutBtn.innerHTML = " Logout";
+              logoutBtn.style.color = "#ef4444"; // Rouge
+
+              // Ajouter le bouton après l'email
+              loginLink.parentNode.insertBefore(
+                logoutBtn,
+                loginLink.nextSibling
+              );
+
+              // Gérer le clic sur Logout
+              logoutBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                logout();
+              });
             }
         }
     }
