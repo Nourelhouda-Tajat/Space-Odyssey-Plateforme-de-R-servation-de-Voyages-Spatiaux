@@ -229,7 +229,7 @@
 
         <div class="max-w-3xl mx-auto pb-12">
             <!-- Booking Form -->
-            <div class="booking-card p-6 md:p-8">
+            <div class="booking-card p-6 md:p-8 h-fit">
                 <form id="bookingForm" class="space-y-6">
                     
                     <!-- Journey Details -->
@@ -277,14 +277,13 @@
                         
                         
                         <!-- Accommodation Type (Dynamic) -->
-                        <div class="mb-4" id="accommodationContainer">
-                        </div>
+                        <div id="accommodationContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                     </div>
 
                     <div class="border-b border-blue-500"></div>
 
                     <!-- Personal Information -->
-                    <div>
+                    <!-- <div>
                         <h2 class="font-orbitron text-2xl mb-4 text-glow">Personal Information</h2>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -313,13 +312,17 @@
                             <label class="block text-gray-300 mb-2 text-sm">Special Requirements</label>
                             <textarea class="form-textarea w-full px-4 py-3" id="specialReq" rows="4" placeholder="Any special requirements or notes..." maxlength="500"></textarea>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Buttons -->
                     <div class="space-y-3 pt-2">
+                        <div id="passengerContainer" class="space-y-10 mt-10"></div>
+
                         <button type="button" id="addPassengerBtn" class="btn-secondary text-white w-full py-3 rounded-lg font-semibold">
                             Add Passenger
                         </button>
+                        <!-- <div id="passengerContainer" class="space-y-4 mt-4"></div> -->
+
                         <button type="submit" class="btn-primary text-white w-full py-3 rounded-lg font-semibold glow">
                             Confirm Booking
                         </button>
