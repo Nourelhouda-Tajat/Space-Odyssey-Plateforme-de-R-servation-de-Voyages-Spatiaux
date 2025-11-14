@@ -140,7 +140,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Add Passenger (Group only)
   addPassengerBtn.addEventListener("click", () => {
-    passengerCount++;
-    passengerContainer.appendChild(createPassengerBlock(passengerCount));
+    if (passengerCount < 6) {
+      passengerCount++;
+      passengerContainer.appendChild(createPassengerBlock(passengerCount));
+    } else {
+      alert("Maximum 6 passengers allowed");
+    }
   });
 });
