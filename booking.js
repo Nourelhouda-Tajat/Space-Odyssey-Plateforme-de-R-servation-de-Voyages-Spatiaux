@@ -10,9 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const bookingForm = document.getElementById("bookingForm");
   const departureDate = document.getElementById("departureDate");
 
-  // REGEX POUR VALIDATION
+  // REGEX POUR VALIDATION (AJOUT regexName)
   const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const regexPhone = /^[0-9]{10}$/;
+  const regexName = /^[A-Za-zÀ-ÿ\s\-']+$/; // AJOUT: Validation nom/prénom
 
   let selectedDestination = null;
   let selectedAccommodation = null;
@@ -178,6 +179,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // AJOUT: Validation nom/prénom
+    if (
+      input.type === "text" &&
+      (input.placeholder.includes("name") ||
+        input.placeholder.includes("Name")) &&
+      value &&
+      !regexName.test(value)
+    ) {
+      showError(input, "Name can only contain letters, spaces, and hyphens");
+      return false;
+    }
+
     hideError(input);
     return true;
   }
@@ -195,6 +208,104 @@ document.addEventListener("DOMContentLoaded", () => {
     bookings.push(bookingData);
     localStorage.setItem("bookings", JSON.stringify(bookings));
   }
+
+  // AJOUT: FONCTION POUR GÉNÉRER LE TICKET
+  function generateTicket(bookingData) {
+    const ticketContent = `
+      <div class="ticket-container bg-white text-black p-8 rounded-lg max-w-2xl mx-auto" id="printableTicket">
+        <div class="text-center mb-6">
+          <h1 class="text-3xl font-bold text-space-blue">SpaceVoyager</h1>
+          <p class="text-lg text-gray-600">Interstellar Travel Ticket</p>
+        </div>
+        
+        <div class="border-2 border-neon-blue rounded-lg p-6 mb-6">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <h2 class="text-xl font-bold">Booking ID: ${bookingData.id}</h2>
+              <p class="text-gray-600">Issued: ${new Date(
+                bookingData.date
+              ).toLocaleDateString()}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-2xl font-bold text-neon-cyan">${
+                bookingData.totalPrice
+              }</p>
+              <p class="text-gray-600">Status: ${bookingData.status}</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <h3 class="font-semibold text-gray-700">Destination</h3>
+              <p class="text-lg">${bookingData.destination}</p>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-700">Departure Date</h3>
+              <p class="text-lg">${bookingData.departureDate}</p>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-700">Accommodation</h3>
+              <p class="text-lg">${bookingData.accommodation}</p>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-700">Passengers</h3>
+              <p class="text-lg">${bookingData.passengerCount}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="passengers-section mb-6">
+          <h3 class="text-xl font-semibold mb-4">Passenger Details</h3>
+          ${bookingData.passengers
+            .map(
+              (passenger, index) => `
+            <div class="border-b border-gray-200 pb-3 mb-3">
+              <h4 class="font-semibold">Passenger ${index + 1}</h4>
+              <p>${passenger.firstName} ${passenger.lastName}</p>
+              <p class="text-sm text-gray-600">${passenger.email} | ${
+                passenger.phone
+              }</p>
+              ${
+                passenger.specialReq
+                  ? `<p class="text-sm text-gray-600 mt-1">Special Requirements: ${passenger.specialReq}</p>`
+                  : ""
+              }
+            </div>
+          `
+            )
+            .join("")}
+        </div>
+        
+        <div class="text-center text-gray-500 text-sm">
+          <p>Thank you for choosing SpaceVoyager for your interstellar journey!</p>
+          <p>Please arrive at the spaceport 3 hours before departure.</p>
+        </div>
+      </div>
+      
+      <div class="text-end mt-6">
+        <button onclick="printTicket()" class="btn-primary py-3 px-8 rounded-lg mr-4">
+          Print Ticket
+        </button>
+      </div>
+    `;
+
+    return ticketContent;
+  }
+
+  // AJOUT: FONCTIONS POUR IMPRIMER ET FERMER LE TICKET
+  window.printTicket = function () {
+    const printableElement = document.getElementById("printableTicket");
+    const originalContents = document.body.innerHTML;
+
+    document.body.innerHTML = printableElement.innerHTML;
+    window.print();
+    document.body.innerHTML = originalContents;
+    window.location.reload();
+  };
+
+  window.closeTicket = function () {
+    document.getElementById("ticketModal").remove();
+  };
 
   // SOUMISSION
   bookingForm.addEventListener("submit", (e) => {
@@ -291,16 +402,19 @@ document.addEventListener("DOMContentLoaded", () => {
       // Sauvegarder
       saveBooking(bookingData);
 
-      // Confirmation
-      alert(
-        "Booking confirmed!\nBooking ID: " +
-          bookingData.id +
-          "\nTotal: " +
-          priceBox.textContent
-      );
+      // AJOUT: AFFICHER LE TICKET AU LIEU DE L'ALERTE
+      const ticketModal = document.createElement("div");
+      ticketModal.id = "ticketModal";
+      ticketModal.className =
+        "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4";
+      ticketModal.innerHTML = generateTicket(bookingData);
+      document.body.appendChild(ticketModal);
 
-      // Redirection
-      window.location.href = "my-bookings.html";
+      // Supprimer l'ancienne alerte de confirmation
+      // alert("Booking confirmed!\nBooking ID: " + bookingData.id + "\nTotal: " + priceBox.textContent);
+
+      // Redirection supprimée pour permettre la visualisation du ticket
+      // window.location.href = "my-bookings.html";
     }
   });
 });
