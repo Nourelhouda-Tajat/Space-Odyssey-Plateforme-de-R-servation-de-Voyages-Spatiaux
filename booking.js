@@ -10,20 +10,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const bookingForm = document.getElementById("bookingForm");
   const departureDate = document.getElementById("departureDate");
 
+  // REGEX POUR VALIDATION
+  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const regexPhone = /^[0-9]{10}$/;
+
   let selectedDestination = null;
   let selectedAccommodation = null;
   let passengerCount = 1;
   let destinationsData = [];
   let accommodationsData = [];
 
-  // Configuration date (demain à 30 jours)
+  // Configuration date (à partir d'aujourd'hui)
   const today = new Date();
-  const minDate = new Date(today);
-  minDate.setDate(today.getDate() + 1);
-  const maxDate = new Date(today);
-  maxDate.setDate(today.getDate() + 30);
-  departureDate.min = minDate.toISOString().split("T")[0];
-  departureDate.max = maxDate.toISOString().split("T")[0];
+  departureDate.min = today.toISOString().split("T")[0];
 
   // Afficher formulaire Solo par défaut
   passengerContainer.appendChild(createPassengerBlock(1));
@@ -37,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
       destinationsData.forEach((dest) => {
         const option = document.createElement("option");
         option.value = dest.id;
-        option.textContent = dest.name;
+        option.textContent = dest.name + " - $" + dest.price.toLocaleString();
         destinationSelect.appendChild(option);
       });
     });
@@ -68,7 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
         div.className = "accommodation-card";
         div.innerHTML = `
           <h3 class="font-bold mb-2">${acc.name}</h3>
-          <p class="text-sm text-gray-300">${acc.pricePerDay} $/day</p>
+          <p class="text-sm text-gray-400 mb-2">${acc.shortDescription}</p>
+          <p class="text-neon-cyan font-semibold">${acc.pricePerDay} $/day</p>
         `;
         div.addEventListener("click", () => {
           document
@@ -88,9 +88,20 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("input[name='passengers']").forEach((radio) => {
     radio.addEventListener("change", () => {
       passengerContainer.innerHTML = "";
-      let count = radio.value === "Solo" ? 1 : radio.value === "Couple" ? 2 : 3;
-      addPassengerBtn.style.display =
-        radio.value === "Group" ? "block" : "none";
+
+      let count = 1;
+      if (radio.value === "Solo") {
+        count = 1;
+        addPassengerBtn.style.display = "none";
+      }
+      if (radio.value === "Couple") {
+        count = 2;
+        addPassengerBtn.style.display = "none";
+      }
+      if (radio.value === "Group") {
+        count = 3;
+        addPassengerBtn.style.display = "block";
+      }
 
       for (let i = 1; i <= count; i++) {
         passengerContainer.appendChild(createPassengerBlock(i));
@@ -118,31 +129,28 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const days = selectedDestination.dureeVoyage;
+    // Durée fixe de 7 jours pour l'exemple
+    const days = 7;
     const total =
       selectedDestination.price +
-      days * 2 * selectedAccommodation.pricePerDay * passengerCount;
+      days * selectedAccommodation.pricePerDay * passengerCount;
     priceBox.textContent = "$" + total.toLocaleString();
   }
 
   // VALIDATION
   function showError(input, msg) {
-    input.classList.add("error");
+    input.classList.add("border-red-500");
     let errorDiv = input.nextElementSibling;
     if (!errorDiv || !errorDiv.classList.contains("error-message")) {
       errorDiv = document.createElement("div");
-      errorDiv.className = "error-message show";
-      errorDiv.style.color = "#ef4444";
-      errorDiv.style.fontSize = "0.875rem";
-      errorDiv.style.marginTop = "0.25rem";
+      errorDiv.className = "error-message text-red-400 text-sm mt-1";
       input.parentNode.appendChild(errorDiv);
     }
     errorDiv.textContent = msg;
-    errorDiv.classList.add("show");
   }
 
   function hideError(input) {
-    input.classList.remove("error");
+    input.classList.remove("border-red-500");
     const errorDiv = input.nextElementSibling;
     if (errorDiv && errorDiv.classList.contains("error-message")) {
       errorDiv.remove();
@@ -157,22 +165,17 @@ document.addEventListener("DOMContentLoaded", () => {
       return false;
     }
 
-    if (
-      input.type === "email" &&
-      value &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-    ) {
+    if (input.type === "email" && value && !regexEmail.test(value)) {
       showError(input, "Invalid email format");
       return false;
     }
 
-    if (
-      input.type === "tel" &&
-      value &&
-      !/^[0-9]{10}$/.test(value.replace(/[\s\-\(\)]/g, ""))
-    ) {
-      showError(input, "Phone must be 10 digits");
-      return false;
+    if (input.type === "tel" && value) {
+      const cleanPhone = value.replace(/[\s\-\(\)]/g, "");
+      if (!regexPhone.test(cleanPhone)) {
+        showError(input, "Phone must be 10 digits");
+        return false;
+      }
     }
 
     hideError(input);
@@ -181,19 +184,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // VALIDATION EN TEMPS RÉEL
   bookingForm.addEventListener("input", (e) => {
-    if (
-      e.target.classList.contains("form-input") ||
-      e.target.classList.contains("form-textarea")
-    ) {
+    if (e.target.matches(".form-input, .form-textarea")) {
       validateInput(e.target);
     }
   });
+
+  // SAUVEGARDER BOOKING
+  function saveBooking(bookingData) {
+    let bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    bookings.push(bookingData);
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+  }
 
   // SOUMISSION
   bookingForm.addEventListener("submit", (e) => {
     e.preventDefault();
     let isValid = true;
 
+    // Validation destination
     if (!destinationSelect.value) {
       showError(destinationSelect, "Select a destination");
       isValid = false;
@@ -201,6 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
       hideError(destinationSelect);
     }
 
+    // Validation date
     if (!departureDate.value) {
       showError(departureDate, "Select a date");
       isValid = false;
@@ -208,27 +217,90 @@ document.addEventListener("DOMContentLoaded", () => {
       hideError(departureDate);
     }
 
+    // Validation accommodation
     if (!selectedAccommodation) {
       alert("Please select an accommodation");
       isValid = false;
     }
 
-    bookingForm
-      .querySelectorAll(".form-input, .form-textarea")
-      .forEach((input) => {
-        if (!validateInput(input)) isValid = false;
-      });
+    // Validation champs passagers
+    const allInputs = bookingForm.querySelectorAll(
+      ".form-input[required], .form-textarea"
+    );
+    allInputs.forEach((input) => {
+      if (!validateInput(input)) isValid = false;
+    });
 
     if (isValid) {
-      alert("Booking confirmed! Total: " + priceBox.textContent);
-      bookingForm.reset();
-      passengerContainer.innerHTML = "";
-      passengerContainer.appendChild(createPassengerBlock(1));
-      accommodationContainer.innerHTML = "";
-      selectedDestination = null;
-      selectedAccommodation = null;
-      passengerCount = 1;
-      updateTotalPrice();
+      // Collecter les données passagers
+      const passengers = [];
+      const passengerBlocks = passengerContainer.querySelectorAll(".mt-10");
+
+      passengerBlocks.forEach((block) => {
+        const inputs = block.querySelectorAll(".form-input, .form-textarea");
+
+        // Vérification sécurisée des champs
+        const firstName = inputs[0]?.value || "";
+        const lastName = inputs[1]?.value || "";
+        const email = inputs[2]?.value || "";
+        const phone = inputs[3]?.value || "";
+        const specialReq = inputs[4]?.value || "";
+
+        passengers.push({
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          phone: phone,
+          specialReq: specialReq,
+        });
+      });
+
+      // Créer booking object
+      const bookingId = "BK-" + Date.now();
+      const bookingDate = new Date().toISOString();
+
+      const bookingData = {
+        id: bookingId,
+        date: bookingDate,
+        destination: selectedDestination.name,
+        accommodation: selectedAccommodation.name,
+        departureDate: departureDate.value,
+        passengerCount: passengerCount,
+        passengers: passengers,
+        totalPrice: priceBox.textContent,
+        status: "confirmed",
+      };
+
+      // Vérifier si user logged in
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+      if (isLoggedIn !== "true") {
+        const userChoice = confirm(
+          "You are not logged in. Click OK to continue as guest, or Cancel to login first."
+        );
+        if (!userChoice) {
+          window.location.href = "login.html";
+          return;
+        }
+        bookingData.userType = "guest";
+      } else {
+        bookingData.userType = "logged";
+        bookingData.userId = localStorage.getItem("userId");
+      }
+
+      // Sauvegarder
+      saveBooking(bookingData);
+
+      // Confirmation
+      alert(
+        "Booking confirmed!\nBooking ID: " +
+          bookingData.id +
+          "\nTotal: " +
+          priceBox.textContent
+      );
+
+      // Redirection
+      window.location.href = "my-bookings.html";
     }
   });
 });
@@ -252,11 +324,11 @@ function createPassengerBlock(num) {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <label class="block text-gray-300 mb-2 text-sm">Email</label>
-          <input type="email" class="form-input w-full px-4 py-3" placeholder="Enter email" required>
+          <input type="email" class="form-input w-full px-4 py-3" placeholder="Enter your email" required>
         </div>
         <div>
           <label class="block text-gray-300 mb-2 text-sm">Phone</label>
-          <input type="tel" class="form-input w-full px-4 py-3" placeholder="0612345678" required>
+          <input type="tel" class="form-input w-full px-4 py-3" placeholder="Enter your phone number" required>
         </div>
       </div>
       <div>
